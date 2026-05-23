@@ -1,0 +1,86 @@
+server:
+  port: 1122
+  tomcat:
+    accept-count: 2000
+    max-connections: 10000
+
+
+spring:
+#  main:
+#    lazy-initialization: true
+  # application
+  application:
+    name: xxxx.com
+  #DBS
+  datasource:
+    hikari:
+      maximum-pool-size: 80
+      minimum-idle: 20
+      connection-timeout: 3000
+      validation-timeout: 1000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 5000
+    url: jdbc:mysql://localhost:3316/vetautet
+    username: root
+    password: root1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: none  # Không tự động tạo/ cập nhật bảng thay vì update
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        use_sql_comments: true
+  jackson:
+    serialization:
+      indent-output: true
+  # Redis server connection settings
+  data:
+    redis:
+      host: 127.0.0.1 # Host of the Redis server
+      port: 6319 # Port of the Redis server for connection
+      password: ""  # Password for connecting to the Redis server (default is empty)
+      lettuce:
+        pool: # Connection pool settings
+          max-active: 10 # Maximum number of active connections in the pool (uses -1 for no limit)
+          max-idle: 5 # Maximum number of idle connections in the pool
+          min-idle: 5 # Minimum number of idle connections in the pool
+#          max-wait: -1ms # Maximum wait time to get a connection from the pool (uses -1 for no limit)
+      connect-timeout: 30000 # Connection timeout (in milliseconds)
+#    redis:
+#      sentinel:
+#        master: mymaster  # Đặt đúng tên master theo Sentinel config
+#        nodes:
+#          - localhost:26379
+#          - localhost:26380
+#          - localhost:26381
+#      password: 123456
+  threads:
+    virtual:
+      enabled: true
+
+auth:
+  jwt:
+    secret: ${AUTH_JWT_SECRET:dev-only-ticket-booking-secret-change-before-production-2026}
+    access-token-ttl-minutes: ${AUTH_ACCESS_TOKEN_TTL_MINUTES:15}
+  refresh-token:
+    ttl-days: ${AUTH_REFRESH_TOKEN_TTL_DAYS:14}
+    cookie-name: refresh_token
+    cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
+    cookie-same-site: Lax
+
+app:
+  stock:
+    warmup:
+      enabled: true
+
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE:VNPAY}
+  secret-key: ${VNPAY_SECRET_KEY:A5804EB6E1C63A6E771729A696A841E6}
+  pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+  return-url: ${VNPAY_RETURN_URL:http://127.0.0.1:1122/api/payments/vnpay/callback}

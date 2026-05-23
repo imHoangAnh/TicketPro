@@ -1,0 +1,116 @@
+# ---------------------------------------------------------------------------
+# Java / Maven
+# ---------------------------------------------------------------------------
+target/
+**/target/
+
+# Keep Maven wrapper jar if a wrapper is added later.
+!.mvn/wrapper/maven-wrapper.jar
+
+# Java runtime crash dumps and generated logs
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# ---------------------------------------------------------------------------
+# Frontend / Node / Vite
+# ---------------------------------------------------------------------------
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+
+.vite/
+**/.vite/
+.vite-temp/
+**/.vite-temp/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------------------------------------------------------------------------
+# Environment / Secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+
+*.local
+application-local.yml
+application-local.yaml
+application-*.local.yml
+application-*.local.yaml
+
+# ---------------------------------------------------------------------------
+# Docker local data
+# ---------------------------------------------------------------------------
+environment/data/
+environment/**/*.pid
+
+# Keep Docker and database initialization files tracked.
+!environment/docker-compose-dev.yml
+!environment/mysql/
+!environment/mysql/init/
+!environment/mysql/init/*.sql
+
+# ---------------------------------------------------------------------------
+# IDEs / Editors
+# ---------------------------------------------------------------------------
+.idea/
+*.iws
+*.iml
+*.ipr
+
+.vscode/
+
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated/
+.springBeans
+.sts4-cache/
+
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ---------------------------------------------------------------------------
+# OS files
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Logs / Temporary files
+# ---------------------------------------------------------------------------
+logs/
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# ---------------------------------------------------------------------------
+# Archives / Generated packages
+# ---------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# ---------------------------------------------------------------------------
+# Test / coverage output
+# ---------------------------------------------------------------------------
+coverage/
+**/coverage/
+.nyc_output/
+surefire-reports/
+failsafe-reports/
