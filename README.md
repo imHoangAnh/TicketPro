@@ -1,21 +1,24 @@
 # Event Ticket Booking System
 
-He thong dat ve su kien gom backend Java / Spring Boot theo huong DDD
-multi-module va frontend React / Vite. Du an ho tro luong chinh: xem su kien,
-chon hang ve, dat ve, giu ton kho bang Redis, thanh toan VNPAY, va trang quan tri cho admin.
+An event ticket booking system with a DDD-flavoured multi-module Java/Spring
+Boot backend and a React/Vite frontend. The application supports public event
+browsing, ticket type selection, authenticated order placement, Redis-backed
+stock reservation, mock payment, VNPAY sandbox payment, and an admin dashboard.
 
-## Tinh Nang Chinh
+## Features
 
-- Dang ky, dang nhap bang email/password.
-- JWT access token va refresh token opaque luu trong Redis.
-- Phan quyen `USER` va `ADMIN`.
-- Public user xem danh sach su kien dang active va chi tiet hang ve.
-- User dat ve, xem don hang cua minh, huy don hang dang `PENDING`.
-- Redis Lua lam cong dat ve atomic truoc khi cap nhat ton kho MySQL.
-- Thanh toan mock success va VNPAY sandbox.
-- Admin tao/sua/an/hien/xoa mem su kien va hang ve.
-- Admin xem don hang.
-- Frontend React co cac man hinh public, auth, cart/payment va dashboard admin.
+- Email/password registration and login.
+- JWT access tokens with opaque refresh tokens stored in Redis.
+- `USER` and `ADMIN` role-based access control.
+- Public browsing for active events and active ticket types.
+- Authenticated users can place orders, view their orders, and cancel pending
+  orders.
+- Redis Lua stock gate before MySQL stock update.
+- Mock success payment and VNPAY sandbox payment.
+- Admin event and ticket type management.
+- Admin order visibility.
+- React frontend with public pages, auth pages, cart/payment flow, and admin
+  dashboard.
 
 ## Tech Stack
 
@@ -24,14 +27,14 @@ chon hang ve, dat ve, giu ton kho bang Redis, thanh toan VNPAY, va trang quan tr
 | Backend | Java 21, Spring Boot 3.3.5, Maven |
 | Frontend | React, Vite, Axios, React Router, Lucide icons |
 | Database | MySQL 8 |
-| Cache/Session/Stock | Redis |
+| Cache / Session / Stock | Redis |
 | Security | Spring Security, JWT, BCrypt |
 | Payment | Mock payment, VNPAY sandbox |
 | Local runtime | Docker Compose |
 
-## Kien Truc Module
+## Architecture
 
-Backend duoc tach module theo huong DDD-flavoured clean architecture:
+The backend is split into DDD-flavoured clean architecture modules:
 
 ```text
 xxxx-start
@@ -49,17 +52,19 @@ xxxx-infrastructure
   -> xxxx-application contracts when needed
 ```
 
-Vai tro tung module:
+Module responsibilities:
 
-- `xxxx-start`: Spring Boot entrypoint, runtime composition root, config.
-- `xxxx-controller`: REST controllers, security filter, request/response DTO.
-- `xxxx-application`: use case orchestration, transaction boundary, auth,
-  order, payment, cache/port contracts.
-- `xxxx-domain`: entity, enum, domain service, repository contract, business
-  rules.
-- `xxxx-infrastructure`: JPA adapter, Redis adapter, Redisson lock, VNPAY
-  gateway adapter.
-- `xxxx.fe.com`: React frontend.
+- `xxxx-start`: Spring Boot entrypoint, runtime composition root, application
+  configuration.
+- `xxxx-controller`: REST controllers, security filter, web configuration, and
+  request/response DTOs.
+- `xxxx-application`: use case orchestration, transaction boundaries, DTOs,
+  authentication, order, payment, cache, and port contracts.
+- `xxxx-domain`: domain entities, enums, domain services, repository contracts,
+  and business rules.
+- `xxxx-infrastructure`: JPA adapters, Redis adapter, Redisson lock adapter,
+  and VNPAY gateway adapter.
+- `xxxx.fe.com`: React/Vite frontend.
 
 Runtime flow:
 
@@ -72,7 +77,7 @@ React frontend
                   -> MySQL, Redis, VNPAY
 ```
 
-## Thu Muc Quan Trong
+## Project Structure
 
 ```text
 .
@@ -86,17 +91,17 @@ React frontend
 `-- docs/                   # Architecture, product contracts, story packets
 ```
 
-## Yeu Cau Moi Truong
+## Prerequisites
 
-Can cai san:
+Install:
 
 - Docker Desktop.
 - Java 21.
 - Maven.
-- Node.js 20+ hoac 22 LTS.
+- Node.js 20+ or Node.js 22 LTS.
 - npm.
 
-Kiem tra:
+Check your environment:
 
 ```powershell
 docker --version
@@ -107,29 +112,30 @@ node -v
 npm -v
 ```
 
-Neu dung JDK co san tren may hien tai:
+If you use the bundled JDK path from this machine:
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Android\openjdk\jdk-21.0.8'
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 ```
 
-## Chay MySQL Va Redis Bang Docker
+## Run MySQL and Redis with Docker
 
-Tu thu muc root:
+From the repository root:
 
 ```powershell
+cd E:\JavaProject\ticketbook\xxxx.com-13-05-26
 docker-compose -f environment\docker-compose-dev.yml up -d
 ```
 
-Thong tin ket noi local:
+Local connection details:
 
 | Service | Host | Port | Username | Password | Database |
 | --- | --- | --- | --- | --- | --- |
 | MySQL | `localhost` | `3316` | `root` | `root1234` | `vetautet` |
 | Redis | `127.0.0.1` | `6319` | none | none | n/a |
 
-Kiem tra container:
+Check containers:
 
 ```powershell
 docker ps
@@ -137,14 +143,14 @@ docker logs pre-event-mysql
 docker logs pre-event-redis
 ```
 
-File init SQL nam o:
+The MySQL initialization script is:
 
 ```text
 environment/mysql/init/ticket_init.sql
 ```
 
-Luu y: MySQL chi chay init SQL khi data directory con trong. Neu can reset DB
-local:
+MySQL only runs init scripts when its data directory is empty. To reset the
+local database:
 
 ```powershell
 docker-compose -f environment\docker-compose-dev.yml down
@@ -152,11 +158,12 @@ Rename-Item environment\data\db_data environment\data\db_data_backup
 docker-compose -f environment\docker-compose-dev.yml up -d
 ```
 
-Lenh tren se doi ten data folder cu. Du lieu local cu se khong con duoc dung.
+This switches the app to a fresh local database. The old data remains in the
+renamed backup folder but is no longer used by the container.
 
-## Ket Noi MySQL Bang DataGrip
+## Connect with DataGrip
 
-Tao data source MySQL trong DataGrip:
+Create a MySQL data source:
 
 ```text
 Host: localhost
@@ -172,10 +179,13 @@ JDBC URL:
 jdbc:mysql://localhost:3316/vetautet?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Ho_Chi_Minh
 ```
 
-Sau khi connect, tick schema `vetautet` trong `Databases...`, roi mo
-`vetautet -> tables`.
+After connecting, open `Databases...`, select the `vetautet` schema, then open:
 
-Bang seed chinh:
+```text
+vetautet -> tables
+```
+
+Main seeded tables:
 
 ```text
 users
@@ -188,108 +198,114 @@ order_items
 payments
 ```
 
-## Chay Backend
+## Run the Backend
 
-Backend chay port `1122`.
+The backend runs on port `1122`.
 
-Build jar:
+Build the executable jar:
 
 ```powershell
+cd E:\JavaProject\ticketbook\xxxx.com-13-05-26
+
 $env:JAVA_HOME='C:\Program Files\Android\openjdk\jdk-21.0.8'
 $env:PATH="$env:JAVA_HOME\bin;$env:PATH"
 
 mvn -pl xxxx-start -am clean package
 ```
 
-Chay jar:
+Run the jar:
 
 ```powershell
 java -jar xxxx-start\target\xxxx-start-1.0-SNAPSHOT.jar
 ```
 
-Backend chay thanh cong khi log co:
+The backend has started successfully when the log contains:
 
 ```text
 Tomcat started on port 1122
 Started StartApplication
 ```
 
-Kiem tra API public:
+Check the public API:
 
 ```powershell
 Invoke-RestMethod http://localhost:1122/api/events
 ```
 
-Hoac mo tren browser:
+Or open:
 
 ```text
 http://localhost:1122/api/events
 ```
 
-Neu muon chay bang Spring Boot Maven Plugin, dung full coordinate:
+If you prefer Spring Boot Maven Plugin, use the full plugin coordinate:
 
 ```powershell
 mvn -pl xxxx-start -am org.springframework.boot:spring-boot-maven-plugin:3.3.5:run
 ```
 
-## Chay Frontend
+## Run the Frontend
 
-Mo terminal khac:
+Open a second terminal:
 
 ```powershell
+cd E:\JavaProject\ticketbook\xxxx.com-13-05-26\xxxx.fe.com
 npm install
 npm run dev
 ```
 
-Frontend mac dinh chay tai:
+The frontend runs at:
 
 ```text
 http://localhost:5173
 ```
 
-Frontend dang goi backend truc tiep qua:
+The frontend calls the backend at:
 
 ```text
 http://localhost:1122
 ```
 
-CORS backend dang allow:
+Backend CORS allows:
 
 ```text
 http://localhost:5173
 ```
 
-Vi vay nen mo frontend bang `localhost`, khong nen dung `127.0.0.1`.
+Use `localhost`, not `127.0.0.1`, when opening the frontend.
 
-Build frontend:
+Build the frontend:
 
 ```powershell
+cd E:\JavaProject\ticketbook\xxxx.com-13-05-26\xxxx.fe.com
 npm run build
 ```
 
-## Tai Khoan Test
+## Test Accounts
 
-Neu DB duoc khoi tao tu `ticket_init.sql`, co san:
+If the database was initialized from `ticket_init.sql`, these accounts are
+available:
 
 | Role | Email | Password |
 | --- | --- | --- |
 | Admin | `admin@example.com` | `password123` |
 | User | `user@example.com` | `password123` |
 
-Flow user:
+Recommended user flow:
 
-1. Dang nhap `user@example.com`.
-2. Vao `/tickets`.
-3. Chon su kien.
-4. Chon hang ve va so luong.
-5. Bam dat ve de vao `/cart`.
-6. Bam tiep tuc dat ve va thanh toan.
-7. Chon mock payment hoac VNPAY sandbox.
+1. Log in as `user@example.com`.
+2. Open `/tickets`.
+3. Select an event.
+4. Select a ticket type and quantity.
+5. Click the booking button to navigate to `/cart`.
+6. Confirm order placement.
+7. Select mock payment or VNPAY sandbox payment.
 
-Luu y: vao thang `/cart` se khong co route state nen trang se bao khong co ve
-trong gio hang. Can di tu trang chi tiet su kien sang cart.
+Note: opening `/cart` directly will not call the order API because the page
+expects route state from the event detail page. Navigate through the ticket
+detail page first.
 
-## API Chinh
+## Main API Endpoints
 
 Public:
 
@@ -336,7 +352,7 @@ GET    /api/admin/orders
 GET    /api/admin/orders/{orderId}
 ```
 
-Tao order:
+Create order request:
 
 ```json
 {
@@ -345,15 +361,15 @@ Tao order:
 }
 ```
 
-## Cau Hinh Quan Trong
+## Configuration
 
-Backend config:
+Backend configuration:
 
 ```text
 xxxx-start/src/main/resources/application.yml
 ```
 
-Gia tri mac dinh:
+Important defaults:
 
 ```yaml
 server:
@@ -370,7 +386,7 @@ spring:
       port: 6319
 ```
 
-Bien moi truong co the override:
+Environment variable overrides:
 
 ```text
 AUTH_JWT_SECRET
@@ -408,58 +424,80 @@ Docker Compose config:
 docker-compose -f environment\docker-compose-dev.yml config
 ```
 
-## Loi Thuong Gap
+## Troubleshooting
 
-### Maven bao `No plugin found for prefix spring-boot`
+### Maven reports `No plugin found for prefix spring-boot`
 
-Dung full plugin coordinate:
+Use the full plugin coordinate:
 
 ```powershell
 mvn -pl xxxx-start -am org.springframework.boot:spring-boot-maven-plugin:3.3.5:run
 ```
 
-Hoac build jar va chay:
+Or build and run the jar:
 
 ```powershell
 mvn -pl xxxx-start -am clean package
 java -jar xxxx-start\target\xxxx-start-1.0-SNAPSHOT.jar
 ```
 
-### Backend khong connect duoc MySQL
+### Backend cannot connect to MySQL
 
-Kiem tra container va port:
+Check the container and port mapping:
 
 ```powershell
 docker ps
 docker logs pre-event-mysql
 ```
 
-MySQL phai map:
+MySQL must expose:
 
 ```text
 3316 -> 3306
 ```
 
-### Backend khong connect duoc Redis
+### Backend cannot connect to Redis
 
-Kiem tra:
+Check Redis:
 
 ```powershell
 docker ps
 docker logs pre-event-redis
 ```
 
-Redis phai map:
+Redis must expose:
 
 ```text
 6319 -> 6379
 ```
 
+### Frontend has CORS or API call failures
 
-## Tai Lieu Du An
+- Backend must be running at `http://localhost:1122`.
+- Frontend should be opened at `http://localhost:5173`.
+- Do not open the frontend with `127.0.0.1:5173`.
+- Log in before calling `/api/orders` or `/api/payments`.
 
-- `docs/ARCHITECTURE.md`: kien truc va module boundary.
-- `docs/product/`: product contract hien tai.
-- `docs/stories/`: story packets theo tung epic.
-- `docs/TEST_MATRIX.md`: bang mapping behavior sang validation evidence.
-- `docs/decisions/`: cac quyet dinh kien truc/san pham quan trong.
+### Opening `/cart` directly does not call the API
+
+This is current behavior. `/cart` needs route state from the event detail page.
+Use this flow:
+
+```text
+/tickets -> /ticket/{id} -> booking button -> /cart
+```
+
+## Project Documentation
+
+- `docs/ARCHITECTURE.md`: architecture and module boundaries.
+- `docs/product/`: current product contracts.
+- `docs/stories/`: story packets grouped by epic.
+- `docs/TEST_MATRIX.md`: behavior-to-validation evidence matrix.
+- `docs/decisions/`: durable product and architecture decisions.
+
+## Current Status
+
+The main backend stories have validation evidence: runtime cleanup, domain data
+model, auth, event/ticket management, order/stock, payment, and DDD boundary
+refactor. The React frontend is implemented around the current `/api/*`
+contracts and continues to be stabilized alongside the backend API.
